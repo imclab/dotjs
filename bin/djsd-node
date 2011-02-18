@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+var http = require('http');
+http.createServer(function (req, res) {
+	var parsedUrl	= require('url').parse(req.url)
+	var filename	= process.env.HOME+"/.js/"+parsedUrl.pathname.substring(1);
+	try {
+		var content	= require('fs').readFileSync(filename);
+	}catch (e) {}
+	res.writeHead(content ? 200 : 204, {
+		'Access-Control-Allow-Origin'	: '*',
+		'Control-Type'			: 'text/javascript'
+	});
+	res.end(content);
+}).listen(3131, "127.0.0.1");
+
+console.log('Server running at http://127.0.0.1:8124/');
