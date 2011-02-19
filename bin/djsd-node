@@ -1,20 +1,10 @@
 #!/usr/bin/env node
 
 var gmDirname	= process.env.HOME+"/.js/greasemonkey";
-var gmBaseNames	= require('fs').readdirSync(gmDirname).filter(function(value){
-	return value.match(/\.user\.js$/);
-});
+var gmScripts	= require('./node-greasemonkey.js').parsedir(gmDirname);
 
 
-gmBaseNames.forEach(function(gmBaseName){
-	var filename	= gmDirname+"/"+gmBaseName;
-	var opts	= require('./node-greasemonkey.js').parseFile(filename)
-	console.log(gmBaseName, opts)
-})
-
-
-var http = require('http');
-http.createServer(function (req, res) {
+require('http').createServer(function (req, res) {
 	var parsedUrl	= require('url').parse(req.url)
 	var filename	= process.env.HOME+"/.js/"+parsedUrl.pathname.substring(1);
 	try {
@@ -26,5 +16,3 @@ http.createServer(function (req, res) {
 	});
 	res.end(content);
 }).listen(3131, "127.0.0.1");
-
-console.log('Server running at http://127.0.0.1:8124/');
