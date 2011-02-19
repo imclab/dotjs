@@ -1,5 +1,18 @@
 #!/usr/bin/env node
 
+var gmDirname	= process.env.HOME+"/.js/greasemonkey";
+var gmBaseNames	= require('fs').readdirSync(gmDirname).filter(function(value){
+	return value.match(/\.user\.js$/);
+});
+
+
+gmBaseNames.forEach(function(gmBaseName){
+	var filename	= gmDirname+"/"+gmBaseName;
+	var opts	= require('./node-greasemonkey.js').parseFile(filename)
+	console.log(gmBaseName, opts)
+})
+
+
 var http = require('http');
 http.createServer(function (req, res) {
 	var parsedUrl	= require('url').parse(req.url)
