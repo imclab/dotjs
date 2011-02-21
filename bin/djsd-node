@@ -1,15 +1,32 @@
 #!/usr/bin/env node
 
+// get the greasemonkeys scripts
+// - TODO a watchers ?
+var nodegm	= require('./node-greasemonkey.js')
 var gmDirname	= process.env.HOME+"/.js/greasemonkey";
-var gmScripts	= require('./node-greasemonkey.js').parsedir(gmDirname);
-
+var gmScripts	= nodegm.parsedir(gmDirname);
 
 require('http').createServer(function (req, res) {
 	var parsedUrl	= require('url').parse(req.url)
 	var filename	= process.env.HOME+"/.js/"+parsedUrl.pathname.substring(1);
+	var content	= ""
+	
+	// get the greasemonkey scripts
+	gmScripts.forEach(function(gmScript){
+		var url	= req.headers['referer'];
+		// TODO what if the referer is not there ?
+		if( url === undefined )	return;
+		if( nodegm.matchUrl(gmScript, url) ){
+			content	+= require('fs').readFileSync(gmScript.filename);
+		}
+	})
+
+	// get the dotjs script
 	try {
-		var content	= require('fs').readFileSync(filename);
+		content	+= require('fs').readFileSync(filename);
 	}catch (e) {}
+	
+	// send the content
 	res.writeHead(content ? 200 : 204, {
 		'Access-Control-Allow-Origin'	: '*',
 		'Control-Type'			: 'text/javascript'
